@@ -5,7 +5,7 @@ Date:   Wed Aug 12 11:07:01 2020 -0700
     pop_keyboard_backlight
 
 diff --git a/panels/keyboard/cc-keyboard-panel.c b/panels/keyboard/cc-keyboard-panel.c
-index f11b8ceea..483553b71 100644
+index f11b8ceea..859910716 100644
 --- a/panels/keyboard/cc-keyboard-panel.c
 +++ b/panels/keyboard/cc-keyboard-panel.c
 @@ -25,6 +25,7 @@
@@ -20,7 +20,7 @@ index f11b8ceea..483553b71 100644
    GtkWidget           *value_compose;
  
    GtkListBoxRow       *common_shortcuts_row;
-+  GtkListBoxRow       *keyboard_backlight_color_row;
++  GtkBin              *keyboard_backlight_bin;
  };
  
  CC_PANEL_REGISTER (CcKeyboardPanel, cc_keyboard_panel)
@@ -28,27 +28,24 @@ index f11b8ceea..483553b71 100644
    gtk_widget_class_bind_template_child (widget_class, CcKeyboardPanel, value_alternate_chars);
    gtk_widget_class_bind_template_child (widget_class, CcKeyboardPanel, value_compose);
    gtk_widget_class_bind_template_child (widget_class, CcKeyboardPanel, common_shortcuts_row);
-+  gtk_widget_class_bind_template_child (widget_class, CcKeyboardPanel, keyboard_backlight_color_row);
++  gtk_widget_class_bind_template_child (widget_class, CcKeyboardPanel, keyboard_backlight_bin);
  
    gtk_widget_class_bind_template_callback (widget_class, special_chars_activated);
    gtk_widget_class_bind_template_callback (widget_class, keyboard_shortcuts_activated);
-@@ -268,4 +271,11 @@ cc_keyboard_panel_init (CcKeyboardPanel *self)
+@@ -268,4 +271,8 @@ cc_keyboard_panel_init (CcKeyboardPanel *self)
  
    self->alt_chars_dialog = cc_xkb_modifier_dialog_new (self->input_source_settings, &LV3_MODIFIER);
    self->compose_dialog = cc_xkb_modifier_dialog_new (self->input_source_settings, &COMPOSE_MODIFIER);
 +
-+  PopKeyboardColorButton *color_button = pop_keyboard_color_button_new();
-+  GtkWidget *widget = pop_keyboard_color_button_widget(color_button);
-+  gtk_container_add (GTK_CONTAINER (self->keyboard_backlight_color_row), widget);
++  GtkWidget *widget = pop_keyboard_backlight_widget();
++  gtk_container_add (GTK_CONTAINER (self->keyboard_backlight_bin), widget);
 +  gtk_widget_show_all(widget);
-+  gtk_widget_set_valign(widget, GTK_ALIGN_CENTER);
-+  pop_keyboard_color_button_free(color_button);
  }
 diff --git a/panels/keyboard/cc-keyboard-panel.ui b/panels/keyboard/cc-keyboard-panel.ui
-index 0e7873d40..a7f0fb5f0 100644
+index 0e7873d40..4403da5f2 100644
 --- a/panels/keyboard/cc-keyboard-panel.ui
 +++ b/panels/keyboard/cc-keyboard-panel.ui
-@@ -252,6 +252,38 @@
+@@ -252,6 +252,23 @@
                      </child>
                    </object>
                  </child>
@@ -64,24 +61,9 @@ index 0e7873d40..a7f0fb5f0 100644
 +                  </object>
 +                </child>
 +                <child>
-+                  <object class="GtkFrame">
++                  <object class="GtkFrame" id="keyboard_backlight_bin">
 +                    <property name="visible">True</property>
-+                    <property name="can_focus">False</property>
-+                    <child>
-+                      <object class="GtkListBox" id="keyboard_backlight_listbox">
-+                        <property name="visible">True</property>
-+                        <property name="can_focus">True</property>
-+                        <property name="selection-mode">none</property>
-+                        <property name="width-request">250</property>
-+                        <child>
-+                          <object class="HdyActionRow" id="keyboard_backlight_color_row">
-+                            <property name="visible">True</property>
-+                            <property name="can_focus">True</property>
-+                            <property name="title" translatable="yes">Color</property>
-+                          </object>
-+                        </child>
-+                      </object>
-+                    </child>
++                    <property name="shadow-type">GTK_SHADOW_NONE</property>
 +                  </object>
 +                </child>
                </object>
